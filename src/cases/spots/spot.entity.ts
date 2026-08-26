@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('category')
-export class Category {
+@Entity('spot')
+export class Spot {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
