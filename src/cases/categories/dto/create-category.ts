@@ -8,4 +8,6 @@ export class CreateCategoryDto {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   @MaxLength(60)
   name: string;
+  description: any;
+  price: any;
 }
