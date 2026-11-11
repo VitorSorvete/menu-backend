@@ -12,3 +12,4 @@ import { Category } from '../categories/category.entity';
   exports: [ProductService]
 })
 export class ProductModule {}
+

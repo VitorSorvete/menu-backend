@@ -12,8 +12,8 @@ import {
 } from '@nestjs/common';
 import { Product } from './product.entity';
 import { ProductService } from './product.service';
-import { CreateCategoryDto } from '../categories/dto/create-category';
-import { UpdateCategoryDto } from '../categories/dto/update-category';
+import { CreateProductDto } from './dto/create-product';
+import { UpdateProductDto } from './dto/update-Product';
 
 @Controller('products')
 export class ProductController {
@@ -25,13 +25,17 @@ export class ProductController {
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Product> {
+  findOne(
+    @Param('id', ParseUUIDPipe)
+    id: string,
+  ): Promise<Product> {
     return this.service.findOne(id);
   }
+
   @Post()
   create(
     @Body()
-    dto: CreateCategoryDto,
+    dto: CreateProductDto,
   ): Promise<Product> {
     return this.service.create(dto);
   }
@@ -41,7 +45,7 @@ export class ProductController {
     @Param('id', ParseUUIDPipe)
     id: string,
     @Body()
-    dto: UpdateCategoryDto,
+    dto: UpdateProductDto,
   ): Promise<Product> {
     return this.service.update(id, dto);
   }

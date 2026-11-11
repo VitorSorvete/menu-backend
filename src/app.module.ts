@@ -20,7 +20,7 @@ import { OrderModule } from './cases/orders/order.module';
         );
         if (!databaseUrl) {
           throw new Error(
-            'A variavel de ambiente DATABASE_URL não foi encontrada',
+            'A variavel de ambiente DATABASE_URL não foi encontrada! ',
           );
         }
         return {
@@ -36,7 +36,7 @@ import { OrderModule } from './cases/orders/order.module';
     ProductModule,
     SpotModule,
     GuestCheckModule,
-    OrderModule
+    OrderModule,
   ],
 })
 export class AppModule {}
