@@ -1,7 +1,12 @@
 import { Repository } from 'typeorm';
 import { Category } from './category.entity';
+import { Product } from '../products/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category';
 import { UpdateCategoryDto } from './dto/update-category';
 
@@ -10,7 +15,7 @@ export class CategoryService {
   constructor(
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
-  ) {}
+  ) { }
 
   findAll(): Promise<Category[]> {
     return this.categoryRepository.find({
@@ -48,6 +53,21 @@ export class CategoryService {
 
   async remove(id: string): Promise<void> {
     const category = await this.findOne(id);
+
+    const products = await this.categoryRepository.manager
+      .getRepository(Product)
+      .count({
+        where: {
+          category: { id },
+        },
+      });
+
+    if (products > 0) {
+      throw new ConflictException(
+        'Não é possível excluir esta categoria porque existem produtos vinculados a ela.',
+      );
+    }
+
     await this.categoryRepository.remove(category);
   }
 }
