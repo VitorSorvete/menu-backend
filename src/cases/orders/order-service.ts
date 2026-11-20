@@ -19,7 +19,7 @@ export class OrderService {
 
     @InjectRepository(OrderItem)
     private readonly orderItemRepository: Repository<OrderItem>,
-  ) {}
+  ) { }
 
   private async prepareItems(dto: CreateOrderItemDto): Promise<OrderItem> {
     const product = await this.productService.findOne(dto.productId);
@@ -62,42 +62,62 @@ export class OrderService {
     return this.orderRepository.save(order);
   }
 
-  findAll(): Promise<Order[]>{
+  async findAll(): Promise<Order[]> {
     return this.orderRepository.find({
-        order: { createdAt: 'ASC'}
+      relations: {
+        guestCheck: {
+          spot: true,
+        },
+        items: {
+          product: true,
+        },
+      },
+      order: {
+        createdAt: 'DESC',
+      },
     });
   }
 
   async findOne(id: string): Promise<Order> {
-      const order = await this.orderRepository.findOneBy({ id });
+    const order = await this.orderRepository.findOne({
+      where: { id },
+      relations: {
+        guestCheck: {
+          spot: true,
+        },
+        items: {
+          product: true,
+        },
+      },
+    });
 
-      if (!order) {
-        throw new NotFoundException('Pedido não encontrado!');
-      }
-
-      return order;
+    if (!order) {
+      throw new NotFoundException('Pedido não encontrado!');
     }
 
-    async updateStatus(id: string, dto: UpdateOrderStatusDto): Promise<Order> {
-        const order = await this.findOne(id);
+    return order;
+  }
 
-        //Determino a sequencia obrigatoria de mudança de status
-        const nextStatus : Record<OrderStatus, OrderStatus | undefined> = {
-            [OrderStatus.NEW]: OrderStatus.PREPARING,
-            [OrderStatus.PREPARING]: OrderStatus.READY,
-            [OrderStatus.READY]: OrderStatus.DELIVERED,
-            [OrderStatus.DELIVERED]: undefined
-        }
+  async updateStatus(id: string, dto: UpdateOrderStatusDto): Promise<Order> {
+    const order = await this.findOne(id);
 
-        //Verifico se o client esta enviando um status valido
-        if(nextStatus[dto.status] !== dto.status) {
-            throw new BadRequestException('Status inválido')
-        }
-
-        //Forço a mudança de status
-        order.status = dto.status
-
-        //Gravo a alteração no banco
-        return this.orderRepository.save(order);
+    //Determino a sequencia obrigatoria de mudança de status
+    const nextStatus: Record<OrderStatus, OrderStatus | undefined> = {
+      [OrderStatus.NEW]: OrderStatus.PREPARING,
+      [OrderStatus.PREPARING]: OrderStatus.READY,
+      [OrderStatus.READY]: OrderStatus.DELIVERED,
+      [OrderStatus.DELIVERED]: undefined
     }
+
+    //Verifico se o client esta enviando um status valido
+    if (nextStatus[order.status] !== dto.status) {
+      throw new BadRequestException('Status inválido');
+    }
+
+    //Forço a mudança de status
+    order.status = dto.status
+
+    //Gravo a alteração no banco
+    return this.orderRepository.save(order);
+  }
 }

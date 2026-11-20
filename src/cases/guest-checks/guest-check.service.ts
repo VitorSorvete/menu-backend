@@ -18,7 +18,7 @@ export class GuestCheckService {
 
     @InjectRepository(Spot)
     private readonly spotRepository: Repository<Spot>,
-  ) {}
+  ) { }
 
   async create(dto: CreateGuestCheckDto): Promise<GuestCheck> {
     //Regra #1 Não se abre comanda em mesa inexistaente
@@ -84,7 +84,7 @@ export class GuestCheckService {
         spot: { id: spotId },
         status: GuestCheckStatus.OPENED,
       },
-      relations: {spot: true}
+      relations: { spot: true }
     });
   }
 
@@ -97,5 +97,18 @@ export class GuestCheckService {
     }
 
     return this.create({ spotId })
+  }
+  async findAllOpened(): Promise<GuestCheck[]> {
+    return this.guestCheckRepository.find({
+      where: {
+        status: GuestCheckStatus.OPENED,
+      },
+      relations: {
+        spot: true,
+      },
+      order: {
+        createdAt: 'DESC',
+      },
+    });
   }
 }

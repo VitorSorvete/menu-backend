@@ -15,24 +15,23 @@ import { GuestCheck } from './guest-check.entity';
 export class GuestCheckController {
   constructor(private readonly service: GuestCheckService) {}
 
+  @Get()
+  findAllOpened(): Promise<GuestCheck[]> {
+    return this.service.findAllOpened();
+  }
+
   @Get(':id')
   findOne(@Param('id', ParseUUIDPipe) id: string): Promise<GuestCheck> {
     return this.service.findOne(id);
   }
 
   @Post()
-  create(
-    @Body()
-    dto: CreateGuestCheckDto,
-  ): Promise<GuestCheck> {
+  create(@Body() dto: CreateGuestCheckDto): Promise<GuestCheck> {
     return this.service.create(dto);
   }
 
   @Patch(':id/close')
-  close(
-    @Param('id', ParseUUIDPipe)
-    id: string,
-  ): Promise<GuestCheck> {
+  close(@Param('id', ParseUUIDPipe) id: string): Promise<GuestCheck> {
     return this.service.close(id);
   }
 }

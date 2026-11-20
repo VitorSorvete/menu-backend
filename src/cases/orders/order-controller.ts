@@ -10,27 +10,26 @@ export class OrderController {
 
     constructor(
         private readonly service: OrderService
-    ){}
+    ) { }
 
     @Post()
-    create(@Body() dto: CreateOrderDto): Promise<Order>{
+    create(@Body() dto: CreateOrderDto): Promise<Order> {
         return this.service.create(dto);
     }
 
     @Get()
-    findAll(): Promise<Order[]>{
+    findAll(): Promise<Order[]> {
         return this.service.findAll();
     }
 
     @Get(':id')
-    findOne(@Param('id, ParseUUIDPipe') id: string): Promise<Order>{
+    findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Order> {
         return this.service.findOne(id);
     }
 
     //Cobrar a diferença de patch e put
     @Patch(':id/status')
-    updateStatus(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateOrderStatusDto): Promise<Order>
-    {
+    updateStatus(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateOrderStatusDto): Promise<Order> {
         return this.service.updateStatus(id, dto);
     }
 }
